@@ -1,0 +1,8 @@
+name: HCProtocol
+main: socket.main
+version: 1.5.2
+softdepend:  
+commands:
+   socket:
+      description: Process command on another platform
+      usage: /socket <ExecutingCommand> (IF U NOT ADMIN, YOU CAN'T EXECUTE COMMAND)
