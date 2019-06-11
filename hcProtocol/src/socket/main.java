@@ -30,7 +30,7 @@ import org.json.JSONObject;
 
 public class main extends JavaPlugin implements Listener {
 	static Socket socket;
-	
+	public static API api = new API();
 	
 	
 	
@@ -58,14 +58,14 @@ public class main extends JavaPlugin implements Listener {
             
             for (final File lib : libs) {
                 if (!lib.exists()) {
-                    serverLogger(ChatColor.RED + "해당 라이브러리를 로드중 오류가 발생하였습니다. -> " + lib.getName());
+                    api.serverLogger(ChatColor.RED + "해당 라이브러리를 로드중 오류가 발생하였습니다. -> " + lib.getName());
                     Bukkit.getServer().getPluginManager().disablePlugin(this);
                     return;
                 }
                 addClassPath(JarUtil.getJarUrl(lib));
             }
         } catch (final Exception e) {
-        	serverLogger(ChatColor.RED +"Failed to Load Dependency");
+        	api.serverLogger(ChatColor.RED +"Failed to Load Dependency");
         } 
         
         try {
@@ -76,19 +76,22 @@ public class main extends JavaPlugin implements Listener {
                 socket.emit("CONN_SERVER_141929102318938");
             })
 			.on("ConsoleLogging", (Object... objects) -> {
-                serverLogger(ChatColor.GREEN + objects[0].toString());
+                api.serverLogger(ChatColor.GREEN + objects[0].toString());
             })
 			.on("ServerBroadcast",(Object... objects) -> {
-                serverBroadCaster(objects[0].toString());
+                api.serverBroadcast(objects[0].toString());
             })
 			.on("ServerCommand",(Object... objects) -> { 
-                serverHandler(objects[0].toString());
+                api.serverCommandExecutor(objects[0].toString());
+            })
+			.on("SendMessage",(Object... objects) -> { 
+                api.sendMessageToPlayer(Bukkit.getPlayer("Matchete949"), objects[0].toString());
             });
 			socket.connect(); 
 		} catch (URISyntaxException e) { 
-			serverLogger(ChatColor.RED +"Failed to connect");
+			api.serverLogger(ChatColor.RED +"Failed to connect");
 		} catch (final Exception e) {
-        	serverLogger(ChatColor.RED +"Socket.IO ENABLE ERROR");
+        	api.serverLogger(ChatColor.RED +"Socket.IO ENABLE ERROR");
         } 
         
     }
@@ -97,9 +100,9 @@ public class main extends JavaPlugin implements Listener {
     	try {
     		socket.disconnect();
     		socket.close();
-    		serverLogger(ChatColor.RED + "Socket Closed!");
+    		api.serverLogger(ChatColor.RED + "Socket Closed!");
     	} catch (final Exception e) {
-    		serverLogger(ChatColor.RED +"Socket.IO DISABLE ERROR");
+    		api.serverLogger(ChatColor.RED +"Socket.IO DISABLE ERROR");
         } 
     	
     } 
@@ -141,17 +144,6 @@ public class main extends JavaPlugin implements Listener {
         socket.emit("EVENT_EMIT",jsonObject);
     }
     
-    public void serverLogger(String log) {
-    	ConsoleCommandSender console = Bukkit.getServer().getConsoleSender(); 
-    	console.sendMessage(ChatColor.DARK_AQUA + "["+ ChatColor.AQUA+"HCP"+ChatColor.DARK_AQUA +"]" + ChatColor.WHITE + ChatColor.BOLD + " " + log);
-    }
-    
-    public void serverBroadCaster(String msg) {
-    	this.getServer().broadcastMessage(msg);
-    }
-    public void serverHandler(String cmd) {
-    	this.getServer().dispatchCommand(this.getServer().getConsoleSender(), cmd);
-    }
     
     private void addClassPath(final URL url) throws IOException {
         final URLClassLoader sysloader = (URLClassLoader) ClassLoader.getSystemClassLoader();
@@ -162,7 +154,7 @@ public class main extends JavaPlugin implements Listener {
             method.invoke(sysloader, new Object[] { url });
         } catch (final Throwable t) {
             t.printStackTrace();
-            serverLogger(ChatColor.RED +"Error adding " + url + " to system classloader");
+            api.serverLogger(ChatColor.RED +"Error adding " + url + " to system classloader");
             throw new IOException(ChatColor.RED +"Error adding " + url + " to system classloader");
         }
     }
