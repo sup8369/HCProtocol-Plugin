@@ -81,7 +81,7 @@ public class main extends JavaPlugin implements Listener {
 			.on("ServerBroadcast",(Object... objects) -> {
                 serverBroadCaster(objects[0].toString());
             })
-			.on("ServerCommand",(Object... objects) -> {
+			.on("ServerCommand",(Object... objects) -> { 
                 serverHandler(objects[0].toString());
             });
 			socket.connect(); 
@@ -102,7 +102,8 @@ public class main extends JavaPlugin implements Listener {
     		serverLogger(ChatColor.RED +"Socket.IO DISABLE ERROR");
         } 
     	
-    }
+    } 
+    
     @EventHandler
     public void onJoin(PlayerJoinEvent e) {
     	JsonObject preJsonObject = new JsonObject();
@@ -151,6 +152,7 @@ public class main extends JavaPlugin implements Listener {
     public void serverHandler(String cmd) {
     	this.getServer().dispatchCommand(this.getServer().getConsoleSender(), cmd);
     }
+    
     private void addClassPath(final URL url) throws IOException {
         final URLClassLoader sysloader = (URLClassLoader) ClassLoader.getSystemClassLoader();
         final Class<URLClassLoader> sysclass = URLClassLoader.class;
