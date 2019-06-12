@@ -13,6 +13,7 @@ import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerKickEvent;
@@ -144,6 +145,21 @@ public class main extends JavaPlugin implements Listener {
         socket.emit("EVENT_EMIT",jsonObject);
     }
     
+    @EventHandler
+    public void onDeath(PlayerDeathEvent e) { 
+    	JsonObject preJsonObject = new JsonObject();
+    	preJsonObject.addProperty("type", e.getEventName());
+    	preJsonObject.addProperty("playerName", e.getEntity().getPlayer().getDisplayName());
+        preJsonObject.addProperty("deathMessage", e.getDeathMessage());
+        try {
+        	preJsonObject.addProperty("killerName", e.getEntity().getKiller().getDisplayName());
+        }
+        catch (NullPointerException err) {
+        	
+        }
+        JSONObject jsonObject = new JSONObject(preJsonObject.toString());
+        socket.emit("EVENT_EMIT",jsonObject);
+    }
     
     private void addClassPath(final URL url) throws IOException {
         final URLClassLoader sysloader = (URLClassLoader) ClassLoader.getSystemClassLoader();
